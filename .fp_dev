@@ -1,0 +1,6 @@
+DB_HOST=10.0.2.242
+DB_DRIVER= mysql
+DB_USER=devdbadmin
+DB_PASSWORD=3rEu9HgVvuX7gLGu
+DB_NAME=live_data_fitpass_2015
+DB_PORT=3306 #Default mysql port

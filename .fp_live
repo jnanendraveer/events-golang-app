@@ -1,0 +1,6 @@
+DB_HOST="fitpass-web-api-rds.cnalsn9orrvm.ap-south-1.rds.amazonaws.com"
+DB_DRIVER= "mysql"
+DB_USER="fitpassdb"
+DB_PASSWORD="V2cQr3AwcZtTnK2d"
+DB_NAME="live_data_fitpass_2015"
+DB_PORT="" #Default mysql port
