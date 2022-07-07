@@ -1,20 +1,21 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-func (server *Server) IndexController(w http.ResponseWriter, r *http.Request) {
-	const AddForm = `
+func (server *Server) IndexController(c *gin.Context) {
+	AddForm := []byte(`
 	<html>
 	<h3 style="top: 50%;
 		text-align: center;
 		margin-top: 10%;
 		font-size: 90px;"><a href="https://fitpass.co.in" style="text-decoration: none"><span style="    color: #ef4c4f;">FITPASS</span></a></h3>
-		</html>`
+		</html>`)
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, AddForm)
+	ContentTypeHTML := "text/html; charset=utf-8"
+	c.Data(http.StatusOK, ContentTypeHTML, AddForm)
 	return
 }
