@@ -1,4 +1,4 @@
-module github.com/jnanendraveer/transactions-golang-app
+module github.com/jnanendraveer/events-golang-app
 
 go 1.16
 

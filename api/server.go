@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/jnanendraveer/transactions-golang-app/api/controllers"
+	"github.com/jnanendraveer/events-golang-app/api/controllers"
 	"github.com/joho/godotenv"
 )
 

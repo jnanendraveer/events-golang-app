@@ -5,16 +5,41 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jnanendraveer/transactions-golang-app/api/models"
-	"github.com/jnanendraveer/transactions-golang-app/api/responses"
+	"github.com/jnanendraveer/events-golang-app/api/models"
+	"github.com/jnanendraveer/events-golang-app/api/responses"
+	"github.com/jnanendraveer/events-golang-app/api/utils/CommonFunction"
 )
 
-func (server *Server) WebEngageEventController(c *gin.Context) {
+func (server *Server) WebEngageTransactionEventController(c *gin.Context) {
 	var RequestData map[string]interface{}
 	c.BindJSON(&RequestData)
 	json.Unmarshal(models.WebEngageEvents(RequestData), &RequestData)
 	responses.JSON(c, http.StatusOK, RequestData)
 	return
+}
+
+func (server *Server) WebEngageTransactionCreateController(c *gin.Context) {
+	var (
+		err                       error
+		RequestData               map[string]interface{}
+		db                        = server.DB
+		CustomerPendingOrderModel models.CustomerPendingOrders
+		ResponseCode              int64 = http.StatusOK
+	)
+
+	if err = c.BindJSON(&RequestData); err != nil {
+		ResponseCode = http.StatusPreconditionFailed
+		Attatchment := CommonFunction.Attachments(ResponseCode, nil, "")
+		c.JSON(http.StatusPreconditionFailed, Attatchment)
+		return
+	}
+
+	CustomerPendingOrderModel.FillRemainningCustomerPendingOrder(RequestData)
+	CustomerPendingOrderModel.SaveCustomerPendingOrders(db)
+	Attatchment := CommonFunction.Attachments(ResponseCode, nil, "")
+	c.JSON(http.StatusOK, Attatchment)
+	return
+
 }
 
 // func (server *Server) WebEngageTransactionSuccessController(c *gin.Context) {
@@ -32,13 +57,3 @@ func (server *Server) WebEngageEventController(c *gin.Context) {
 // 	responses.JSON(c, http.StatusOK, RequestData)
 // 	return
 // }
-
-func (server *Server) WebEngageController(c *gin.Context) {
-	var (
-		RequestData map[string]interface{}
-		// db          = server.DB
-	)
-
-	c.BindJSON(&RequestData)
-
-}
