@@ -68,6 +68,7 @@ func WebEngageEvents() (string, error) {
 	url := Constants.BILLDESK_CREATE_ORDER_URL
 	method := "POST"
 	// webEngageData, _ := json.Marshal(RequestData)
+	fmt.Printf(token)
 	payload := strings.NewReader(token)
 
 	client := &http.Client{}
