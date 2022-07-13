@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -19,14 +19,19 @@ type Server struct {
 func (server *Server) Initialize(Dbdriver, DbUser, DbPassword, DbPort, DbHost, DbName string) {
 
 	var err error
-	//fmt.Printf("We are connected to the %s database", Dbdriver)
-	//dsn := "user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai"
-	//db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	DBURL := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
-	server.DB, err = gorm.Open(mysql.Open(DBURL), &gorm.Config{
+	dsn := "host=localhost user=root password=admin dbname=postgres port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	server.DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction: true,
 		PrepareStmt:            true,
 	})
+	//fmt.Printf("We are connected to the %s database", Dbdriver)
+	// dsn := "host=localhost  user=root password=admin dbname=fp_local port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	// server.DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	// DBURL := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", DbUser, DbPassword, DbHost, DbPort, DbName)
+	// server.DB, err = gorm.Open(mysql.Open(DBURL), &gorm.Config{
+	// 	SkipDefaultTransaction: true,
+	// 	PrepareStmt:            true,
+	// })
 
 	// server.DB, err := gorm.Open(sqlserver.Open(DBURL), &gorm.Config{})
 	//gorm.Open(Dbdriver, DBURL)
@@ -42,7 +47,7 @@ func (server *Server) Initialize(Dbdriver, DbUser, DbPassword, DbPort, DbHost, D
 	// server.DB.Debug().AutoMigrate(models.Login{}) //database migration
 
 	server.Router = gin.New()
-	// server.Router.Use(gin.Recovery(), gin.Logger())
+	server.Router.Use(gin.Recovery(), gin.Logger())
 
 	server.initializeRoutes()
 }

@@ -40,10 +40,13 @@ func (RD *CustomerPendingOrders) SaveCustomerPendingOrders(db *gorm.DB) (*Custom
 		}
 	}()
 	if err := tx.Error; err != nil {
+		fmt.Println(err)
 		return &CustomerPendingOrders{}, err
 	}
+	fmt.Printf("cdsv hjj")
 	if err := tx.Debug().Create(&RD).Error; err != nil {
 		tx.Rollback()
+		fmt.Println(err)
 		return &CustomerPendingOrders{}, err
 	}
 	// tx.SavePoint("fitpass_payments_link")

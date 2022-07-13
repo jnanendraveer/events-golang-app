@@ -35,8 +35,14 @@ func (server *Server) WebEngageTransactionCreateController(c *gin.Context) {
 	}
 
 	CustomerPendingOrderModel.FillRemainningCustomerPendingOrder(RequestData)
-	CustomerPendingOrderModel.SaveCustomerPendingOrders(db)
+	if CustomerPendingOrderModel.SaveCustomerPendingOrders(db); err != nil {
+		ResponseCode = http.StatusUnauthorized
+		Attatchment := CommonFunction.Attachments(ResponseCode, err, "")
+		c.JSON(http.StatusUnauthorized, Attatchment)
+		return
+	}
 	Attatchment := CommonFunction.Attachments(ResponseCode, nil, "")
+
 	c.JSON(http.StatusOK, Attatchment)
 	return
 
