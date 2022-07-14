@@ -4,9 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
-	"os"
 	"strings"
 
 	jose "github.com/dvsekhvalnov/jose2go"
@@ -31,33 +29,19 @@ func (server *Server) CreateOrderController(c *gin.Context) {
 }
 
 func GetOutboundIP() string {
-	// url := "https://api.ipify.org?format=text"
-	// fmt.Printf("Getting IP address from  ipify\n")
-	// resp, err := http.Get(url)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// defer resp.Body.Close()
-	// ip, err := ioutil.ReadAll(resp.Body)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// fmt.Println("ip is ........", string(ip))
-	addrs, err := net.InterfaceAddrs()
+	url := "https://api.ipify.org?format=text"
+	fmt.Printf("Getting IP address from  ipify\n")
+	resp, err := http.Get(url)
 	if err != nil {
-		os.Stderr.WriteString("Oops: " + err.Error() + "\n")
-		os.Exit(1)
+		panic(err)
 	}
-
-	for _, a := range addrs {
-		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-			if ipnet.IP.To4() != nil {
-				os.Stdout.WriteString(ipnet.IP.String() + "\n")
-				return ipnet.IP.String()
-			}
-		}
+	defer resp.Body.Close()
+	ip, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
 	}
-	return ""
+	fmt.Println("ip is ........", string(ip))
+	return string(ip)
 }
 func WebEngageEvents(obj map[string]interface{}) (string, error) {
 	var (
