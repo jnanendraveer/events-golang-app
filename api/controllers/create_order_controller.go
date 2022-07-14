@@ -1,67 +1,107 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
-	"net"
 	"net/http"
 	"strings"
+	"time"
 
 	jose "github.com/dvsekhvalnov/jose2go"
 	"github.com/gin-gonic/gin"
+	"github.com/jnanendraveer/events-golang-app/api/utils/CommonFunction"
 	"github.com/jnanendraveer/events-golang-app/api/utils/Constants"
+	"gorm.io/gorm"
 )
 
+type PendingOrder struct {
+	PendingOrderId uint64          `gorm:"primary_key;auto_increment" json:"pending_order_id"`
+	UserId         int64           `json:"user_id"`
+	UserName       string          `json:"user_name"`
+	MobileNumber   int64           `json:"mobile_number"`
+	IsSubscription bool            `json:"is_subscription"`
+	DeviceDetails  json.RawMessage `json:"device_details"`
+	CreateTime     time.Time       `sql:"default:CURRENT_TIMESTAMP" json:"create_time"`
+	CreatedBy      string          `gorm:"size:100" json:"created_by"`
+}
+
+func (RD *PendingOrder) TableName() string {
+	return "ftp_pending_orders"
+}
 func (server *Server) CreateOrderController(c *gin.Context) {
+
 	var (
 		err  error
 		data string
+		// obj    json.RawMessage
+		obj    map[string]interface{}
+		orders PendingOrder
 	)
-
-	if data, err = WebEngageEvents(); err != nil {
+	c.BindJSON(&obj)
+	// orders.DeviceDetails = obj
+	orders.CreateTime = CommonFunction.CurrentTime()
+	orders.CreatedBy = Constants.SELF_CUSTOMER
+	orders.IsSubscription = true
+	// orders.SavePendingOrders(server.DB)
+	if data, err = WebEngageEvents(obj); err != nil {
 		c.JSON(http.StatusPreconditionFailed, data)
 		return
 	}
 	c.JSON(http.StatusOK, data)
 	return
 }
-func GetOutboundIP() net.IP {
-	conn, err := net.Dial("udp", "8.8.8.8:80")
-	if err != nil {
-		log.Fatal(err)
+
+func (RD *PendingOrder) SavePendingOrders(db *gorm.DB) (*PendingOrder, error) {
+	tx := db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+	if err := tx.Error; err != nil {
+		fmt.Println(err)
+		return &PendingOrder{}, err
 	}
-	defer conn.Close()
+	data := []PendingOrder{}
+	for i := 0; i < 5000; i++ {
+		data = append(data, *RD)
+	}
 
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
-
-	return localAddr.IP
+	if err := tx.Debug().Create(&data).Error; err != nil {
+		tx.Rollback()
+		fmt.Println(err)
+		return &PendingOrder{}, err
+	}
+	// tx.SavePoint("fitpass_payments_link")
+	return RD, tx.Commit().Error
 }
-func WebEngageEvents() (string, error) {
+
+func GetOutboundIP() string {
+	url := "https://api.ipify.org?format=text"
+	fmt.Printf("Getting IP address from  ipify\n")
+	resp, err := http.Get(url)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	ip, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("ip is ........", string(ip))
+	return string(ip)
+}
+func WebEngageEvents(obj map[string]interface{}) (string, error) {
 	var (
 		err   error
 		token string
 	)
 	fmt.Println(GetOutboundIP())
-	token, err = jose.Sign(fmt.Sprintf(`{
-		"mercid":"FITPAS2UAT",
-		"orderid":"TSSGF43214F",
-		"amount":"300.00",
-		"order_date":"2020-08-17T15:19:00+0530",
-		"currency":"356",
-		"ru":"https://www.example.com/merchant/api/pgresponse",
-		"additional_info":{
-		"additional_info1":"Details1",
-		"additional_info2":"Details2"
-		},
-		"itemcode":"DIRECT",
-		"device":{
-		"init_channel":"internet",
-		"ip": "%s",
-		"user_agent":"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0",
-		"accept_header":"text/html"
-		}
-		}`, GetOutboundIP()), jose.HS256, []byte("KEHpqq5UWQFwHnL6OBvMr7mln6OWWP3k"),
+	obj["ip"] = GetOutboundIP()
+	bytes, err := json.Marshal(obj)
+
+	token, err = jose.Sign(string(bytes), jose.HS256, []byte("KEHpqq5UWQFwHnL6OBvMr7mln6OWWP3k"),
 		jose.Header("clientid", "fitpas2uat"),
 		jose.Header("alg", "HS256"), jose.Header("kid", "HMAC"))
 
