@@ -4,46 +4,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"os"
 	"strings"
-	"time"
 
 	jose "github.com/dvsekhvalnov/jose2go"
 	"github.com/gin-gonic/gin"
-	"github.com/jnanendraveer/events-golang-app/api/utils/CommonFunction"
 	"github.com/jnanendraveer/events-golang-app/api/utils/Constants"
-	"gorm.io/gorm"
 )
 
-type PendingOrder struct {
-	PendingOrderId uint64          `gorm:"primary_key;auto_increment" json:"pending_order_id"`
-	UserId         int64           `json:"user_id"`
-	UserName       string          `json:"user_name"`
-	MobileNumber   int64           `json:"mobile_number"`
-	IsSubscription bool            `json:"is_subscription"`
-	DeviceDetails  json.RawMessage `json:"device_details"`
-	CreateTime     time.Time       `sql:"default:CURRENT_TIMESTAMP" json:"create_time"`
-	CreatedBy      string          `gorm:"size:100" json:"created_by"`
-}
-
-func (RD *PendingOrder) TableName() string {
-	return "ftp_pending_orders"
-}
 func (server *Server) CreateOrderController(c *gin.Context) {
 
 	var (
 		err  error
 		data string
-		// obj    json.RawMessage
-		obj    map[string]interface{}
-		orders PendingOrder
+		obj  map[string]interface{}
 	)
 	c.BindJSON(&obj)
-	// orders.DeviceDetails = obj
-	orders.CreateTime = CommonFunction.CurrentTime()
-	orders.CreatedBy = Constants.SELF_CUSTOMER
-	orders.IsSubscription = true
-	// orders.SavePendingOrders(server.DB)
 	if data, err = WebEngageEvents(obj); err != nil {
 		c.JSON(http.StatusPreconditionFailed, data)
 		return
@@ -52,52 +30,40 @@ func (server *Server) CreateOrderController(c *gin.Context) {
 	return
 }
 
-func (RD *PendingOrder) SavePendingOrders(db *gorm.DB) (*PendingOrder, error) {
-	tx := db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-	if err := tx.Error; err != nil {
-		fmt.Println(err)
-		return &PendingOrder{}, err
-	}
-	data := []PendingOrder{}
-	for i := 0; i < 5000; i++ {
-		data = append(data, *RD)
-	}
-
-	if err := tx.Debug().Create(&data).Error; err != nil {
-		tx.Rollback()
-		fmt.Println(err)
-		return &PendingOrder{}, err
-	}
-	// tx.SavePoint("fitpass_payments_link")
-	return RD, tx.Commit().Error
-}
-
 func GetOutboundIP() string {
-	url := "https://api.ipify.org?format=text"
-	fmt.Printf("Getting IP address from  ipify\n")
-	resp, err := http.Get(url)
+	// url := "https://api.ipify.org?format=text"
+	// fmt.Printf("Getting IP address from  ipify\n")
+	// resp, err := http.Get(url)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer resp.Body.Close()
+	// ip, err := ioutil.ReadAll(resp.Body)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Println("ip is ........", string(ip))
+	addrs, err := net.InterfaceAddrs()
 	if err != nil {
-		panic(err)
+		os.Stderr.WriteString("Oops: " + err.Error() + "\n")
+		os.Exit(1)
 	}
-	defer resp.Body.Close()
-	ip, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		panic(err)
+
+	for _, a := range addrs {
+		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				os.Stdout.WriteString(ipnet.IP.String() + "\n")
+				return ipnet.IP.String()
+			}
+		}
 	}
-	fmt.Println("ip is ........", string(ip))
-	return string(ip)
+	return ""
 }
 func WebEngageEvents(obj map[string]interface{}) (string, error) {
 	var (
 		err   error
 		token string
 	)
-	fmt.Println(GetOutboundIP())
 	obj["ip"] = GetOutboundIP()
 	bytes, err := json.Marshal(obj)
 
@@ -120,7 +86,7 @@ func WebEngageEvents(obj map[string]interface{}) (string, error) {
 		return "", err
 	}
 	req.Header.Add("Content-Type", "application/jose")
-	req.Header.Add("Bd-Timestamp", "20200712102207")
+	req.Header.Add("Bd-Timestamp", "20220713102207")
 	req.Header.Add("Accept", "application/jose")
 	req.Header.Add("Bd-Traceid", "TSSGF43214F")
 	var res *http.Response
