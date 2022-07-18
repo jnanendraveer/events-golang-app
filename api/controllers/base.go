@@ -19,10 +19,11 @@ type Server struct {
 func (server *Server) Initialize(Dbdriver, DbUser, DbPassword, DbPort, DbHost, DbName string) {
 
 	var err error
-	dsn := "host=localhost user=root password=admin dbname=postgres port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	dsn := "host=localhost user=root password=admin dbname=live_data_fitpass_2022 port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 	server.DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction: true,
 		PrepareStmt:            true,
+		CreateBatchSize:        1000,
 	})
 	//fmt.Printf("We are connected to the %s database", Dbdriver)
 	// dsn := "host=localhost  user=root password=admin dbname=fp_local port=5432 sslmode=disable TimeZone=Asia/Shanghai"
