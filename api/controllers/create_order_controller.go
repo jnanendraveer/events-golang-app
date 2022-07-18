@@ -103,6 +103,7 @@ func WebEngageEvents() (map[string]interface{}, error) {
 		jose.Header("alg", "HS256"), jose.Header("kid", "HMAC"))
 
 	fmt.Printf(token, obj["ip"])
+	obj["token"] = token
 	// url := Constants.BILLDESK_CREATE_ORDER_URL
 	// method := "POST"
 
@@ -139,5 +140,6 @@ func WebEngageEvents() (map[string]interface{}, error) {
 	// 	//go use token
 	// 	fmt.Printf("\ndecoded payload = %v\n%v", token, err)
 	// }
+
 	return obj, err
 }
