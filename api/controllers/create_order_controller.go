@@ -101,8 +101,6 @@ func WebEngageEvents() (map[string]interface{}, error) {
 	token, err := jose.Sign(string(bytes), jose.HS256, []byte("KEHpqq5UWQFwHnL6OBvMr7mln6OWWP3k"),
 		jose.Header("clientid", "fitpas2uat"),
 		jose.Header("alg", "HS256"), jose.Header("kid", "HMAC"))
-
-	fmt.Printf(token, obj["ip"])
 	obj["token"] = token
 	// url := Constants.BILLDESK_CREATE_ORDER_URL
 	// method := "POST"
