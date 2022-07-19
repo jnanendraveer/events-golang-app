@@ -42,9 +42,10 @@ func GetOutboundIP() string {
 func BillDeskJwtTokenGenerate() (map[string]interface{}, error) {
 	var (
 		err error
+		// token string
 	)
 	var obj map[string]interface{}
-	str := []byte(`{"mercid":"FITPAS11UT","orderid":"DSC432212F","amount":"351.00","order_date":"2022-07-19T17:06:00+0530","currency":"351","ru":"https://www.example.com/merchant/api/pgresponse","additional_info":{"additional_info1":"Details1","additional_info2":"Details2"},"itemcode":"DIRECT","device":{"init_channel":"internet","user_agent":"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0","accept_header":"text/html"}}`)
+	str := []byte(`{"mercid":"FITPAS2UAT","orderid":"DSCGD113212F","amount":"300.00","order_date":"2022-07-19T17:11:00+0530","currency":"356","ru":"https://www.example.com/merchant/api/pgresponse","additional_info":{"additional_info1":"Details1","additional_info2":"Details2"},"itemcode":"DIRECT","device":{"init_channel":"internet","user_agent":"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0","accept_header":"text/html"}}`)
 	json.Unmarshal(str, &obj)
 	obj["ip"] = GetOutboundIP()
 
