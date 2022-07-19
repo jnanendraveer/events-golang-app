@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"net/http"
-	"time"
 
 	jose "github.com/dvsekhvalnov/jose2go"
 	"github.com/gin-gonic/gin"
@@ -55,7 +54,7 @@ func BillDeskJwtTokenGenerate() (map[string]interface{}, error) {
 		panic(err)
 	}
 	orderid := fmt.Sprintf("%X", b)
-	str := []byte(fmt.Sprintf(`{"mercid":"FITPAS2UAT","orderid":"%s","amount":"%v","order_date":"%v","currency":%v,"ru":"https://www.example.com/merchant/api/pgresponse","additional_info":{"additional_info1":"Details2"},"itemcode":"DIRECT","device":{"init_channel":"internet","user_agent":"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0","accept_header":"text/html"}}`, orderid, amount, time.Now().Format("2006-01-02 15:04:05"), amount))
+	str := []byte(fmt.Sprintf(`{"mercid":"FITPAS2UAT","orderid":"%s","amount":"%v","order_date":"2022-07-19T17:24:00+0530","currency":%v,"ru":"https://www.example.com/merchant/api/pgresponse","additional_info":{"additional_info1":"Details2"},"itemcode":"DIRECT","device":{"init_channel":"internet","user_agent":"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0","accept_header":"text/html"}}`, orderid, amount, amount))
 	json.Unmarshal(str, &obj)
 	obj["ip"] = GetOutboundIP()
 
