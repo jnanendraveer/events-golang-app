@@ -44,14 +44,14 @@ func BillDeskJwtTokenGenerate() (map[string]interface{}, error) {
 		err error
 	)
 	var obj map[string]interface{}
-	str := []byte(`{"mercid":"FITPAS11UAT","orderid":"DSCD432212F","amount":"350.00","order_date":"2022-07-19T16:54:00+0530","currency":"350","ru":"https://www.example.com/merchant/api/pgresponse","additional_info":{"additional_info1":"Details1","additional_info2":"Details2"},"itemcode":"DIRECT","device":{"init_channel":"internet","user_agent":"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0","accept_header":"text/html"}}`)
+	str := []byte(`{"mercid":"FITPAS11UT","orderid":"DSC432212F","amount":"351.00","order_date":"2022-07-19T17:06:00+0530","currency":"351","ru":"https://www.example.com/merchant/api/pgresponse","additional_info":{"additional_info1":"Details1","additional_info2":"Details2"},"itemcode":"DIRECT","device":{"init_channel":"internet","user_agent":"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0","accept_header":"text/html"}}`)
 	json.Unmarshal(str, &obj)
 	obj["ip"] = GetOutboundIP()
 
 	bytes, err := json.Marshal(obj)
 
 	token, err := jose.Sign(string(bytes), jose.HS256, []byte("KEHpqq5UWQFwHnL6OBvMr7mln6OWWP3k"),
-		jose.Header("clientid", "fitpas2ua"),
+		jose.Header("clientid", "fitpas2uat"),
 		jose.Header("alg", "HS256"), jose.Header("kid", "HMAC"))
 	obj["token"] = token
 	return obj, err
