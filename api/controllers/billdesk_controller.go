@@ -51,7 +51,7 @@ func BillDeskJwtTokenGenerate() (map[string]interface{}, error) {
 	bytes, err := json.Marshal(obj)
 
 	token, err := jose.Sign(string(bytes), jose.HS256, []byte("KEHpqq5UWQFwHnL6OBvMr7mln6OWWP3k"),
-		jose.Header("clientid", "fitpas2uat"),
+		jose.Header("clientid", "fitpas2ua"),
 		jose.Header("alg", "HS256"), jose.Header("kid", "HMAC"))
 	obj["token"] = token
 	return obj, err
