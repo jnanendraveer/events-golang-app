@@ -45,7 +45,7 @@ func BillDeskJwtTokenGenerate() (map[string]interface{}, error) {
 		// token string
 	)
 	var obj map[string]interface{}
-	str := []byte(`{"mercid":"FITPAS2UAT","orderid":"DSCGD113312F","amount":"310.00","order_date":"2022-07-19T17:16:00+0530","currency":"310","ru":"https://www.example.com/merchant/api/pgresponse","additional_info":{"additional_info1":"Details1","additional_info2":"Details2"},"itemcode":"DIRECT","device":{"init_channel":"internet","user_agent":"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0","accept_header":"text/html"}}`)
+	str := []byte(`{"mercid":"FITPAS2UAT","orderid":"DSCGD113112F","amount":"320.00","order_date":"2022-07-19T17:24:00+0530","currency":"320","ru":"https://www.example.com/merchant/api/pgresponse","additional_info":{"additional_info1":"Details1","additional_info2":"Details2"},"itemcode":"DIRECT","device":{"init_channel":"internet","user_agent":"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0","accept_header":"text/html"}}`)
 	json.Unmarshal(str, &obj)
 	obj["ip"] = GetOutboundIP()
 
